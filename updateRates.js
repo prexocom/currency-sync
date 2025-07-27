@@ -9,7 +9,7 @@ const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
 async function updateRates() {
   try {
     // Correct API endpoint with access_key param for your paid plan
-    const url = `https://api.exchangerate.host/live?access_key=${apiKey}&base=${baseCurrency}&symbols=${currencies.join(',')}`;
+    const url = `https://api.exchangerate.host/live?access_key=${apiKey}&source=${baseCurrency}&currencies=${currencies.join(',')}`;
 
     const response = await axios.get(url);
 
