@@ -1,33 +1,46 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
-const apiKey = process.env.EXCHANGERATE_API_KEY;
+const apiKey = process.env.EXCHANGERATE_API_KEY; // your exchangerate.host key
 const baseCurrency = 'UGX';
 const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
 
-async function updateRates() {
+const apiURL = `https://api.exchangerate.host/live?access_key=${apiKey}&source=${baseCurrency}&currencies=${currencies.join(',')}`;
+
+(async () => {
   try {
-    // Correct API endpoint with access_key param for your paid plan
-    const url = `https://api.exchangerate.host/live?access_key=${apiKey}&source=${baseCurrency}&currencies=${currencies.join(',')}`;
+    const res = await fetch(apiURL);
+    const data = await res.json();
 
-    const response = await axios.get(url);
+    console.log("API Response:", data);
 
-    if (!response.data || !response.data.rates) {
-      throw new Error("No exchange rate data received");
+    if (!data || !data.quotes) throw new Error("No exchange rate data");
+
+    // Parse quotes like "UGXUSD": 0.00027 → USD: 0.00027
+    const rates = {};
+    for (const key in data.quotes) {
+      const targetCurrency = key.replace(baseCurrency, '');
+      rates[targetCurrency] = data.quotes[key];
     }
 
-    // Save JSON to local file for hosting later
+    // Prepare the payload to save
+    const payload = {
+      updatedAt: new Date().toISOString(),
+      base: baseCurrency,
+      rates,
+    };
+
+    // Save locally (create 'data' folder if needed)
     const dataDir = path.join(__dirname, 'data');
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 
-    fs.writeFileSync(path.join(dataDir, 'latest.json'), JSON.stringify(response.data, null, 2));
+    fs.writeFileSync(path.join(dataDir, 'latest.json'), JSON.stringify(payload, null, 2));
 
-    console.log("✅ Exchange rates updated successfully.");
-  } catch (error) {
-    console.error("❌ Error updating rates:", error.message || error);
+    console.log("✅ Exchange rates updated and saved locally.");
+
+  } catch (err) {
+    console.error("❌ Error updating rates:", err);
     process.exit(1);
   }
-}
-
-updateRates();
+})();
