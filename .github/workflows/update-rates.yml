@@ -23,5 +23,6 @@ jobs:
       - name: Run updateRates.js
         run: node updateRates.js
         env:
+          EXCHANGERATE_API_KEY: ${{ secrets.EXCHANGERATE_API_KEY }}
           JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
           JSONBIN_BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
