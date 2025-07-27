@@ -1,28 +1,35 @@
-name: Update Currency Rates
+name: Update Exchange Rates
 
 on:
   schedule:
-    - cron: '0 */8 * * *'  # every 8 hours
-  workflow_dispatch:        # manual trigger
+    - cron: '0 */12 * * *' # every 8 hours
+  workflow_dispatch:
 
 jobs:
-  update-rates:
+  update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install axios
+        run: npm install axios
 
-      - name: Run updateRates.js
+      - name: Run update script
         run: node updateRates.js
         env:
           EXCHANGERATE_API_KEY: ${{ secrets.EXCHANGERATE_API_KEY }}
-          JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
-          JSONBIN_BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
+
+      - name: Commit updated rates
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git add data/latest.json
+          git commit -m "Update exchange rates"
+          git push
