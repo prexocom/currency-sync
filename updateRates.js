@@ -1,26 +1,31 @@
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 
-const EXCHANGERATE_API_KEY = process.env.EXCHANGERATE_API_KEY;
-const API_URL = `https://api.apilayer.com/exchangerates_data/latest?base=UGX&symbols=USD,KES,TZS,RWF`;
+const apiKey = process.env.EXCHANGERATE_API_KEY;
+const baseCurrency = 'UGX';
+const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
 
 async function updateRates() {
   try {
-    const response = await axios.get(API_URL, {
-      headers: { apikey: EXCHANGERATE_API_KEY }
-    });
+    // Correct API endpoint with access_key param for your paid plan
+    const url = `https://api.exchangerate.host/live?access_key=${apiKey}&base=${baseCurrency}&symbols=${currencies.join(',')}`;
 
-    const data = response.data;
-    if (!data || !data.rates) throw new Error('No exchange rate data');
+    const response = await axios.get(url);
 
-    const filePath = path.join(__dirname, 'data', 'latest.json');
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, JSON.stringify({ updated: Date.now(), rates: data.rates }, null, 2));
+    if (!response.data || !response.data.rates) {
+      throw new Error("No exchange rate data received");
+    }
 
-    console.log('✅ Exchange rates saved to /data/latest.json');
+    // Save JSON to local file for hosting later
+    const dataDir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+
+    fs.writeFileSync(path.join(dataDir, 'latest.json'), JSON.stringify(response.data, null, 2));
+
+    console.log("✅ Exchange rates updated successfully.");
   } catch (error) {
-    console.error('❌ Error updating rates:', error);
+    console.error("❌ Error updating rates:", error.message || error);
     process.exit(1);
   }
 }
