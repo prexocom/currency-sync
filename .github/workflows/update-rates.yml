@@ -10,20 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+  - name: Setup Node.js
+    uses: actions/setup-node@v3
+    with:
+      node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+  - name: Install dependencies
+    run: npm install
 
-      - name: Run update script
-        env:
-          JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
-          BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
-          EXCHANGE_API_URL: "https://api.exchangerate.host/latest?base=UGX&symbols=USD,KES,TZS,RWF"
-        run: node updateRates.js
+  - name: Run update script
+    run: node updateRates.js
+    env:
+      JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
+      JSONBIN_BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
