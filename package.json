@@ -1,0 +1,12 @@
+{
+  "name": "currency-sync",
+  "version": "1.0.0",
+  "description": "Currency rate sync script",
+  "main": "updateRates.js",
+  "scripts": {
+    "start": "node updateRates.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
