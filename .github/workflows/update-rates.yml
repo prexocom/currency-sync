@@ -1,0 +1,29 @@
+name: Update Exchange Rates
+
+on:
+  schedule:
+    - cron: "0 */8 * * *"  # Every 8 hours
+  workflow_dispatch:       # Allow manual runs from GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run update script
+        env:
+          JSONBIN_API_KEY: ${{ secrets.JSONBIN_API_KEY }}
+          BIN_ID: ${{ secrets.JSONBIN_BIN_ID }}
+          EXCHANGE_API_URL: "https://api.exchangerate.host/latest?base=UGX&symbols=USD,KES,TZS,RWF"
+        run: node updateRates.js
