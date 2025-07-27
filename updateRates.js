@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 const jsonbinKey = process.env.JSONBIN_API_KEY;
 const binId = process.env.JSONBIN_BIN_ID;
-const apiKey = process.env.EXCHANGE_API_KEY; // your exchangerate.host key
+const apiKey = process.env.EXCHANGERATE_API_KEY; // your exchangerate.host key
 const baseCurrency = 'UGX';
 const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
 
