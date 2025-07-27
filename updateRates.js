@@ -2,19 +2,29 @@ const fetch = require("node-fetch");
 
 const jsonbinKey = process.env.JSONBIN_API_KEY;
 const binId = process.env.JSONBIN_BIN_ID;
+const apiKey = process.env.EXCHANGE_API_KEY; // your exchangerate.host key
 const baseCurrency = 'UGX';
-
 const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
-const apiURL = `https://api.exchangerate.host/latest?base=${baseCurrency}&symbols=${currencies.join(',')}`;
+
+const apiURL = `https://api.exchangerate.host/live?access_key=${apiKey}&source=${baseCurrency}&currencies=${currencies.join(',')}`;
 
 (async () => {
   try {
     const res = await fetch(apiURL);
     const data = await res.json();
 
-    if (!data || !data.rates) throw new Error("No exchange rate data");
+    console.log("API Response:", data);
 
-    const rates = data.rates;
+    if (!data || !data.quotes) throw new Error("No exchange rate data");
+
+    const rates = {};
+    // The live endpoint returns quotes in the form: { "UGXKES": 0.030, "UGXUSD": 0.00027, ... }
+    for (const key in data.quotes) {
+      // extract the target currency code from keys like "UGXKES"
+      const targetCurrency = key.replace(baseCurrency, '');
+      rates[targetCurrency] = data.quotes[key];
+    }
+
     const payload = {
       updatedAt: new Date().toISOString(),
       base: baseCurrency,
