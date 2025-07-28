@@ -4,7 +4,7 @@ const path = require("path");
 
 const apiKey = process.env.EXCHANGERATE_API_KEY; // your exchangerate.host key
 const baseCurrency = 'UGX';
-const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF'];
+const currencies = ['UGX', 'KES', 'USD', 'TZS', 'RWF', 'NGN', 'ZAR', 'EGP', 'GHS'];
 
 const apiURL = `https://api.exchangerate.host/live?access_key=${apiKey}&source=${baseCurrency}&currencies=${currencies.join(',')}`;
 
